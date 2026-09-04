@@ -1,0 +1,46 @@
+<main class="shell">
+  <section class="brand-panel">
+    <header class="brand" aria-label="Glamgest"><span class="brand-mark">G</span><span>glamgest</span></header>
+    <div class="brand-copy"><p class="eyebrow">Gestión que se siente bien</p><h1>Tu negocio de belleza,<br /><em>en buenas manos.</em></h1><p class="intro">Organiza tu agenda, cuida a tus clientes y haz crecer tu salón desde un solo lugar.</p></div>
+    <div class="brand-footer"><span class="status-dot"></span><span>Todo listo para tu próxima cita</span></div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-content">
+      <div class="mobile-brand brand"><span class="brand-mark">G</span><span>glamgest</span></div>
+      @if (activeView === 'dashboard' && currentUser) {
+        <div class="dashboard-head"><p class="eyebrow blue">Espacio Glamgest</p><button class="text-button" type="button" (click)="logout()" [disabled]="loading">Cerrar sesión</button></div>
+        <h2>Hola, {{ currentUser.firstName }}.</h2>
+        <p class="subheading">Tu sesión está activa. Esta es una vista temporal mientras conectamos los módulos de gestión.</p>
+        <div class="welcome-card"><span class="avatar">{{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }}</span><div><strong>{{ currentUser.firstName }} {{ currentUser.lastName }}</strong><span>{{ currentUser.email }}</span></div><b>{{ currentUser.role }}</b></div>
+        <div class="temporary-grid"><div><span>Agenda</span><strong>Próximamente</strong></div><div><span>Clientes</span><strong>Próximamente</strong></div><div><span>Servicios</span><strong>Próximamente</strong></div></div>
+      }
+      @if (activeView === 'login') {
+        <p class="eyebrow blue">Bienvenido de nuevo</p><h2>Entra a tu espacio</h2><p class="subheading">Continúa gestionando lo que hace especial a tu negocio.</p>
+        <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)">
+          <label for="username">Usuario o email</label><input id="username" name="username" type="text" [(ngModel)]="login.username" required placeholder="ej. maria.lopez" autocomplete="username" />
+          <label for="password">Contraseña</label><div class="password-field"><input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="login.password" required placeholder="••••••••" autocomplete="current-password" /><button type="button" class="icon-button" (click)="showPassword = !showPassword">{{ showPassword ? 'Ocultar' : 'Ver' }}</button></div>
+          <div class="form-row"><label class="checkbox"><input type="checkbox" name="remember" [(ngModel)]="login.remember" /> <span>Recordarme</span></label><button type="button" class="text-button" (click)="setView('forgot')">¿Olvidaste tu contraseña?</button></div>
+          <button class="primary-button" type="submit" [disabled]="loading">{{ loading ? 'Conectando...' : 'Iniciar sesión' }} <span>→</span></button>
+        </form>
+        @if (errorMessage) { <p class="error-notice">{{ errorMessage }}</p> } @if (feedback) { <p class="notice">{{ feedback }}</p> }
+        <p class="switch">¿Aún no tienes cuenta? <button type="button" class="text-button" (click)="setView('register')">Crea una gratis</button></p>
+      }
+      @if (activeView === 'register') {
+        <button class="back-button" type="button" (click)="setView('login')">← Volver al inicio</button><p class="eyebrow blue">Empieza hoy</p><h2>Crea tu cuenta</h2><p class="subheading">Tu cuenta de cliente estará lista en un momento.</p>
+        <form #registerForm="ngForm" (ngSubmit)="submit(registerForm)">
+          <div class="input-grid"><div><label for="firstName">Nombre</label><input id="firstName" name="firstName" [(ngModel)]="register.firstName" required minlength="2" placeholder="María" /></div><div><label for="lastName">Apellidos</label><input id="lastName" name="lastName" [(ngModel)]="register.lastName" required minlength="2" placeholder="López" /></div></div>
+          <label for="registerUsername">Usuario</label><input id="registerUsername" name="registerUsername" [(ngModel)]="register.username" required minlength="3" placeholder="maria.lopez" />
+          <label for="registerEmail">Email</label><input id="registerEmail" name="registerEmail" type="email" [(ngModel)]="register.email" required placeholder="maria@email.com" />
+          <label for="registerPassword">Contraseña</label><input id="registerPassword" name="registerPassword" type="password" [(ngModel)]="register.password" required minlength="8" placeholder="Mínimo 8 caracteres" />
+          <button class="primary-button" type="submit" [disabled]="loading">{{ loading ? 'Creando...' : 'Crear cuenta' }} <span>→</span></button>
+        </form>
+        @if (errorMessage) { <p class="error-notice">{{ errorMessage }}</p> } @if (feedback) { <p class="notice">{{ feedback }}</p> }<p class="switch">¿Ya tienes una cuenta? <button type="button" class="text-button" (click)="setView('login')">Inicia sesión</button></p>
+      }
+      @if (activeView === 'forgot') {
+        <button class="back-button" type="button" (click)="setView('login')">← Volver al inicio</button><p class="eyebrow blue">Recuperación segura</p><h2>Recupera el acceso</h2><p class="subheading">Te ayudaremos a volver a entrar a tu cuenta.</p>
+        <form #forgotForm="ngForm" (ngSubmit)="submit(forgotForm)"><label for="forgotEmail">Email de tu cuenta</label><input id="forgotEmail" name="forgotEmail" type="email" [(ngModel)]="email" required placeholder="maria@email.com" /><button class="primary-button" type="submit" [disabled]="loading">{{ loading ? 'Enviando...' : 'Enviar instrucciones' }} <span>→</span></button></form>
+        @if (errorMessage) { <p class="error-notice">{{ errorMessage }}</p> } @if (feedback) { <p class="notice">{{ feedback }}</p> }
+      }
+    </div><footer class="auth-footer"><span>© 2026 Glamgest</span><span>Privacidad <i></i> Ayuda</span></footer>
+  </section>
+</main>
