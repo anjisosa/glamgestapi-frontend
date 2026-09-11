@@ -12,7 +12,7 @@ type AuthView = 'login' | 'register' | 'forgot' | 'dashboard';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './login.component.html',
-  styles: []
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   private readonly authFacade = inject(AuthFacade);

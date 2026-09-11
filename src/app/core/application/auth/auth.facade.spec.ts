@@ -29,4 +29,10 @@ describe('AuthErrorMapper', () => {
 
     expect(mapper.translateError('Contraseña incorrecta', 'INVALID_PASSWORD', 401)).toBe('Contraseña incorrecta.');
   });
+
+  it('should return invalid password when backend sends an invalid password code', () => {
+    const mapper = new AuthErrorMapper();
+
+    expect(mapper.translateError('Contraseña incorrecta', 'INVALID_PASSWORD', 401)).toBe('Contraseña incorrecta.');
+  });
 });
