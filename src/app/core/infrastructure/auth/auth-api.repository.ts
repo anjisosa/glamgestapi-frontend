@@ -1,35 +1,11 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, finalize, map, throwError } from 'rxjs';
-
-export interface UserProfile {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-  createdAt?: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresIn: number;
-  user: UserProfile;
-}
-
-export interface ApiError {
-  status: number;
-  message: string;
-  error?: string;
-  validationErrors?: Record<string, string> | null;
-}
+import { ApiError, AuthResponse, AuthSession, RegisterRequest, UserProfile } from '../../domain/auth/auth.model';
+import { AuthRepository } from '../../domain/auth/auth.repository';
 
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class AuthApiRepository extends AuthRepository {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:8080/auth';
   private readonly storageKey = 'glamgest.auth';
@@ -41,7 +17,7 @@ export class AuthService {
     );
   }
 
-  register(data: { firstName: string; lastName: string; username: string; email: string; password: string }): Observable<UserProfile> {
+  register(data: RegisterRequest): Observable<UserProfile> {
     return this.http.post<UserProfile>(`${this.apiUrl}/register`, data).pipe(
       catchError(error => this.handleError(error))
     );
@@ -58,6 +34,7 @@ export class AuthService {
     if (!session?.refreshToken) {
       return throwError(() => this.toApiError('No hay refresh token disponible', 401));
     }
+
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken: session.refreshToken }).pipe(
       map(response => this.saveSession(response)),
       catchError(error => this.handleError(error))
@@ -87,6 +64,10 @@ export class AuthService {
     }
   }
 
+  toApiError(message: string, status: number): ApiError {
+    return { status, message };
+  }
+
   private saveSession(response: AuthResponse): AuthResponse {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(this.storageKey, JSON.stringify({ token: response.token, refreshToken: response.refreshToken }));
@@ -94,16 +75,18 @@ export class AuthService {
     return response;
   }
 
-  private readSession(): { token: string; refreshToken: string } | null {
+  private readSession(): AuthSession | null {
     if (typeof localStorage === 'undefined') {
       return null;
     }
+
     const rawSession = localStorage.getItem(this.storageKey);
     if (!rawSession) {
       return null;
     }
+
     try {
-      return JSON.parse(rawSession) as { token: string; refreshToken: string };
+      return JSON.parse(rawSession) as AuthSession;
     } catch {
       this.clearSession();
       return null;
@@ -114,10 +97,7 @@ export class AuthService {
     const apiError = error.error && typeof error.error === 'object'
       ? error.error as ApiError
       : this.toApiError('No se pudo conectar con el servidor', error.status);
-    return throwError(() => apiError);
-  }
 
-  private toApiError(message: string, status: number): ApiError {
-    return { status, message };
+    return throwError(() => apiError);
   }
 }
