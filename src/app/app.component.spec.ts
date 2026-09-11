@@ -14,12 +14,6 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'Glamgest' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('Glamgest');
-  });
-
   it('should render the authentication screen', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();

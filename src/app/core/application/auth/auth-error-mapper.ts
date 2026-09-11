@@ -28,7 +28,45 @@ export class AuthErrorMapper {
     const normalized = `${code} ${message}`.toLowerCase();
 
     if (normalized.includes('invalid_credentials') || normalized.includes('invalid credentials') || status === 401) {
-      return 'El usuario o la contraseña no son correctos.';
+      const userPatterns = [
+        'user not found',
+        'usuario no encontrado',
+        'usuario incorrecto',
+        'username not found',
+        'usuario inexistente',
+        'user does not exist',
+        'usuario no existe',
+        'user not exist',
+        'incorrect user',
+        'mal usuario'
+      ];
+      const passwordPatterns = [
+        'invalid password',
+        'password incorrect',
+        'contraseña incorrecta',
+        'wrong password',
+        'password is incorrect',
+        'incorrect password',
+        'invalid_credentials_password'
+      ];
+
+      if (userPatterns.some(pattern => normalized.includes(pattern))) {
+        return 'Usuario incorrecto.';
+      }
+
+      if (passwordPatterns.some(pattern => normalized.includes(pattern))) {
+        return 'Contraseña incorrecta.';
+      }
+
+      if (normalized.includes('password') && !normalized.includes('user')) {
+        return 'Contraseña incorrecta.';
+      }
+
+      if (normalized.includes('user') && !normalized.includes('password')) {
+        return 'Usuario incorrecto.';
+      }
+
+      return 'Usuario o contraseña incorrectos.';
     }
     if (normalized.includes('user_already_exists') || normalized.includes('already exists')) {
       return 'El usuario o el correo electrónico ya están registrados.';

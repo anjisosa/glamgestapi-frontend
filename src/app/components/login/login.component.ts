@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthErrorMapper } from '../../core/application/auth/auth-error-mapper';
 import { AuthFacade } from '../../core/application/auth/auth.facade';
 import { ApiError, RegisterRequest, UserProfile } from '../../core/domain/auth/auth.model';
@@ -16,6 +17,7 @@ type AuthView = 'login' | 'register' | 'forgot' | 'dashboard';
 export class LoginComponent {
   private readonly authFacade = inject(AuthFacade);
   private readonly authErrorMapper = inject(AuthErrorMapper);
+  private readonly router = inject(Router);
 
   activeView: AuthView = 'login';
   showPassword = false;
@@ -61,7 +63,8 @@ export class LoginComponent {
         next: response => {
           this.loading = false;
           this.currentUser = response.user;
-          this.activeView = 'dashboard';
+          const route = this.getDashboardRoute(response.user.role);
+          this.router.navigateByUrl(route);
         },
         error: error => this.showError(error)
       });
@@ -98,11 +101,26 @@ export class LoginComponent {
     });
   }
 
+  getDashboardRoute(role: string | null | undefined): string {
+    const normalizedRole = (role ?? '').trim().toUpperCase();
+
+    if (normalizedRole.includes('ADMIN')) {
+      return '/admin';
+    }
+
+    if (normalizedRole.includes('CLIENT') || normalizedRole.includes('CLIENTE')) {
+      return '/cliente';
+    }
+
+    return '/cliente';
+  }
+
   private finishLogout(): void {
     this.loading = false;
     this.currentUser = null;
     this.activeView = 'login';
     this.feedback = 'Sesión cerrada correctamente.';
+    this.router.navigateByUrl('/login');
   }
 
   private showError(error: ApiError): void {
