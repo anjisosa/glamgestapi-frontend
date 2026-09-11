@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthFacade } from '../../core/application/auth/auth.facade';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -21,7 +23,10 @@ import { Component } from '@angular/core';
             <p class="eyebrow">Panel de cliente</p>
             <h1>Bienvenido</h1>
           </div>
-          <button class="primary-btn">Nueva reserva</button>
+          <div class="actions">
+            <button class="secondary-btn" type="button" (click)="logout()">Cerrar sesión</button>
+            <button class="primary-btn" type="button">Nueva reserva</button>
+          </div>
         </header>
 
         <section class="cards">
@@ -106,6 +111,12 @@ import { Component } from '@angular/core';
       margin-bottom: 28px;
     }
 
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
     .eyebrow {
       margin: 0 0 6px;
       letter-spacing: 0.12em;
@@ -121,15 +132,25 @@ import { Component } from '@angular/core';
       color: #18243f;
     }
 
-    .primary-btn {
+    .primary-btn,
+    .secondary-btn {
       border: none;
-      background: linear-gradient(135deg, #2f6bff 0%, #6ea0ff 100%);
-      color: white;
       padding: 12px 18px;
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #2f6bff 0%, #6ea0ff 100%);
+      color: white;
       box-shadow: 0 8px 18px rgba(47, 107, 255, 0.2);
+    }
+
+    .secondary-btn {
+      background: #fff;
+      color: #d24d5d;
+      border: 1px solid #f2ced3;
     }
 
     .cards {
@@ -181,7 +202,22 @@ import { Component } from '@angular/core';
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .actions {
+        width: 100%;
+        justify-content: space-between;
+      }
     }
   `]
 })
-export class ClientDashboardComponent {}
+export class ClientDashboardComponent {
+  private readonly authFacade = inject(AuthFacade);
+  private readonly router = inject(Router);
+
+  logout(): void {
+    this.authFacade.logout().subscribe({
+      next: () => this.router.navigateByUrl('/login'),
+      error: () => this.router.navigateByUrl('/login')
+    });
+  }
+}

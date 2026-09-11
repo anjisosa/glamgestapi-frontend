@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthFacade } from '../../core/application/auth/auth.facade';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -21,7 +23,10 @@ import { Component } from '@angular/core';
             <p class="eyebrow">Panel de administrador</p>
             <h1>Resumen general</h1>
           </div>
-          <button class="primary-btn">Nuevo reporte</button>
+          <div class="actions">
+            <button class="secondary-btn" type="button" (click)="logout()">Cerrar sesión</button>
+            <button class="primary-btn" type="button">Nuevo reporte</button>
+          </div>
         </header>
 
         <section class="cards">
@@ -106,6 +111,12 @@ import { Component } from '@angular/core';
       margin-bottom: 28px;
     }
 
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
     .eyebrow {
       margin: 0 0 6px;
       letter-spacing: 0.12em;
@@ -121,15 +132,25 @@ import { Component } from '@angular/core';
       color: #17332d;
     }
 
-    .primary-btn {
+    .primary-btn,
+    .secondary-btn {
       border: none;
-      background: linear-gradient(135deg, #1f9d6b 0%, #48c192 100%);
-      color: white;
       padding: 12px 18px;
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #1f9d6b 0%, #48c192 100%);
+      color: white;
       box-shadow: 0 8px 18px rgba(31, 157, 107, 0.2);
+    }
+
+    .secondary-btn {
+      background: #fff;
+      color: #b35f52;
+      border: 1px solid #f0d2ca;
     }
 
     .cards {
@@ -181,7 +202,22 @@ import { Component } from '@angular/core';
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .actions {
+        width: 100%;
+        justify-content: space-between;
+      }
     }
   `]
 })
-export class AdminDashboardComponent {}
+export class AdminDashboardComponent {
+  private readonly authFacade = inject(AuthFacade);
+  private readonly router = inject(Router);
+
+  logout(): void {
+    this.authFacade.logout().subscribe({
+      next: () => this.router.navigateByUrl('/login'),
+      error: () => this.router.navigateByUrl('/login')
+    });
+  }
+}
